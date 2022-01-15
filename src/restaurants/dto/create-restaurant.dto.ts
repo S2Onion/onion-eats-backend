@@ -1,11 +1,12 @@
-import { ArgsType, Field, ObjectType } from '@nestjs/graphql';
+import { ArgsType, Field, InputType } from '@nestjs/graphql';
 
-@ObjectType()
-export class Restaurant {
+//@InputType()
+@ArgsType()
+export class CreateRestaurantDto {
   @Field(() => String)
   name: string;
 
-  @Field(() => Boolean, { nullable: true })
+  @Field(() => Boolean)
   isGood: boolean;
 
   @Field(() => Boolean)
