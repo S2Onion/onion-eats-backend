@@ -11,10 +11,6 @@ export class CreateRestaurantDto {
 
   @Field(() => Boolean)
   @IsBoolean()
-  isGood: boolean;
-
-  @Field(() => Boolean)
-  @IsBoolean()
   isVegan: boolean;
 
   @Field(() => String)
