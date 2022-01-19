@@ -3,8 +3,11 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi'; // 자바 스크립트로 작성되어 있음
+import { CommonModule } from './common/common.module';
 import { Restaurant } from './restaurants/entity/restaurant.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
+import { User } from './users/entities/user.entity';
+import { UsersModule } from './users/users.module';
 
 console.log(Joi);
 
@@ -36,9 +39,11 @@ console.log(Joi);
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod', // Entity를 읽어서 Table Migration 진행
       logging: true,
-      entities: [Restaurant]
+      entities: [Restaurant, User]
     }),
+    CommonModule,
     RestaurantsModule,
+    UsersModule
   ],
   controllers: [],
   providers: [],
