@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
 import * as jwt from 'jsonwebtoken';
 import { JwtService } from 'src/jwt/jwt.service';
@@ -12,7 +11,6 @@ import { User } from './entities/user.entity';
 export class UsersService {
     constructor(
         @InjectRepository(User) private readonly usersRepository: Repository<User>,
-        private readonly configService: ConfigService,
         private readonly jwtService: JwtService,
     ) { }
 
@@ -46,7 +44,7 @@ export class UsersService {
                 return { ok: false, error: 'Wrong password' };
             }
 
-            const token = jwt.sign({ id: user.id }, this.configService.get('SECRET_KEY'));
+            const token = jwt.sign({ id: user.id }, this.jwtService.sign(user.id));
             // JWT 토큰 만들어서 리턴
             return { ok: true, token: token };
         } catch (e) {
