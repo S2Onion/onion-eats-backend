@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi'; // 자바 스크립트로 작성되어 있음
-import { CommonModule } from './common/common.module';
+import { JwtModule } from './jwt/jwt.module';
 import { Restaurant } from './restaurants/entity/restaurant.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { User } from './users/entities/user.entity';
@@ -25,6 +25,7 @@ console.log(Joi);
         DB_USERNAME: Joi.string().required(),
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
+        SECRET_KEY: Joi.string().required(),
       }),
     }),
     GraphQLModule.forRoot({
@@ -41,9 +42,9 @@ console.log(Joi);
       logging: true,
       entities: [Restaurant, User]
     }),
-    CommonModule,
+    JwtModule.forRoot(),
     RestaurantsModule,
-    UsersModule
+    UsersModule,
   ],
   controllers: [],
   providers: [],
