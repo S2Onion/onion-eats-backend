@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as jwt from 'jsonwebtoken';
 import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
 import { CreateAccountInput } from './dtos/create-account.dto';
@@ -44,7 +43,7 @@ export class UsersService {
                 return { ok: false, error: 'Wrong password' };
             }
 
-            const token = jwt.sign({ id: user.id }, this.jwtService.sign(user.id));
+            const token = this.jwtService.sign(user.id);
             // JWT 토큰 만들어서 리턴
             return { ok: true, token: token };
         } catch (e) {

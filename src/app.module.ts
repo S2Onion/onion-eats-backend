@@ -52,12 +52,12 @@ console.log(Joi);
   controllers: [],
   providers: [],
 })
-
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(JwtMiddleWare).forRoutes({
-      path: '/graphql',
-      method: RequestMethod.ALL,
-    });
+    consumer.apply(JwtMiddleWare)
+      .forRoutes({
+        path: '/graphql',
+        method: RequestMethod.ALL,
+      });
   }
 }
