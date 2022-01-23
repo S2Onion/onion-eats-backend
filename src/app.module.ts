@@ -1,8 +1,9 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi'; // 자바 스크립트로 작성되어 있음
+import { JwtMiddleWare } from './jwt/jwt.middleware';
 import { JwtModule } from './jwt/jwt.module';
 import { Restaurant } from './restaurants/entity/restaurant.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
@@ -51,4 +52,12 @@ console.log(Joi);
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(JwtMiddleWare).forRoutes({
+      path: '/graphql',
+      method: RequestMethod.ALL,
+    });
+  }
+}
