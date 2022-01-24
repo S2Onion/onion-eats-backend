@@ -1,4 +1,7 @@
-import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { AuthUser } from 'src/auth/auth-user.decorator';
+import { AuthGuard } from 'src/auth/auth.guard';
 import { CreateAccountInput, createAccountOutput } from './dtos/create-account.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
@@ -36,12 +39,14 @@ export class UsersResolver {
         }
     }
 
+    /**
+     * 토큰에 있는 ID 값으로 유저 정보 조회
+     * @param authUser 토큰에서 확인한 유저 정보 (데코레이터로 확인)
+     * @returns 유저 정보
+     */
     @Query(() => User)
-    me(@Context() context) {
-        if (!context.user) {
-            return;
-        } else {
-            return context.user;
-        }
+    @UseGuards(AuthGuard)
+    me(@AuthUser() authUser: User) {
+        return authUser;
     }
 }
