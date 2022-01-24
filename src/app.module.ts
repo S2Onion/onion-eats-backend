@@ -31,6 +31,7 @@ console.log(Joi);
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: true,
+      context: ({ req }) => ({ user: req['user'] })
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -57,7 +58,7 @@ export class AppModule implements NestModule {
     consumer.apply(JwtMiddleWare)
       .forRoutes({
         path: '/graphql',
-        method: RequestMethod.ALL,
+        method: RequestMethod.POST,
       });
   }
 }

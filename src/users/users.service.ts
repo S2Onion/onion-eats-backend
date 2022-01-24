@@ -50,4 +50,8 @@ export class UsersService {
             return { ok: false, error: e };
         }
     }
+
+    async findById(id: number): Promise<User> {
+        return this.usersRepository.findOne({ id: id });
+    }
 }
