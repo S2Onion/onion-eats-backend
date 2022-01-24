@@ -31,7 +31,7 @@ console.log(Joi);
     }),
     GraphQLModule.forRoot({
       autoSchemaFile: true,
-      context: ({ req }) => ({ user: req['user'] })
+      context: ({ req }) => ({ user: req['user'] }) // Request 마다 context 정보 전달
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',

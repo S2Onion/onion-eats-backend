@@ -11,18 +11,16 @@ export class JwtMiddleWare implements NestMiddleware {
     ) { }
 
     async use(req: Request, res: Response, next: NextFunction) {
-        // console.log(req.headers);
         if ('x-jwt' in req.headers) {
-            const token = req.headers['x-jwt'];
-            const decoded = this.jwtService.verify(token.toString());
-            if (typeof decoded === 'object' && decoded.hasOwnProperty('id')) {
-                try {
-                    const user = await this.userService.findById(decoded['id']);
-                    // console.log(user);
-                    req['user'] = user;
-                } catch (e) {
-                    console.error(e);
+            const token = req.headers['x-jwt']; // Header에서 토큰 값 확인
+            try {
+                const decoded = this.jwtService.verify(token.toString()); // 토큰 유효한지 확인
+                if (typeof decoded === 'object' && decoded.hasOwnProperty('id')) {
+                    const user = await this.userService.findById(decoded['id']); // 토큰의 ID 값에 대한 유저 정보 조회
+                    req['user'] = user; // Request에 유저 정보 추가
                 }
+            } catch (e) {
+                console.error(e);
             }
         }
         next();
