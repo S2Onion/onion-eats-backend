@@ -52,6 +52,11 @@ export class UsersResolver {
         return authUser;
     }
 
+    /**
+     * 프로필 확인
+     * @param userProfileInput 유저 ID 정보
+     * @returns 유저 프로필 정보
+     */
     @Query(() => UserProfileOutput)
     @UseGuards(AuthGuard)
     async userProfile(@Args() userProfileInput: UserProfileInput): Promise<UserProfileOutput> {
@@ -67,14 +72,20 @@ export class UsersResolver {
         }
     }
 
+    /**
+     * 유저 프로필 정보 수정
+     * @param authUser 수정하고자 하는 유저 정보
+     * @param editProfileInput 수정하려는 정보
+     * @returns 업데이트 처리 결과
+     */
     @Mutation(() => EditProfileOutPut)
     @UseGuards(AuthGuard)
     async editProfile(@AuthUser() authUser: User, @Args('input') editProfileInput: EditProfileInput): Promise<EditProfileOutPut> {
         try {
             await this.usersService.editProfile(authUser.id, editProfileInput);
-
+            return { ok: true };
         } catch (e) {
-            return { ok: false, error: e }
+            return { ok: false, error: e };
         }
     }
 }

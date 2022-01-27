@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from 'src/jwt/jwt.service';
 import { Repository } from 'typeorm';
@@ -56,7 +56,17 @@ export class UsersService {
         return this.usersRepository.findOne({ id: id });
     }
 
-    async editProfile(userId: number, { email, password }: EditProfileInput) {
-        return this.usersRepository.update(userId, { email, password });
+    async editProfile(userId: number, { email, password }: EditProfileInput): Promise<User> {
+        const user = await this.findById(userId);
+        if (!user) { // 조회된 User 정보가 없을 경우
+            throw new BadRequestException('Data not found');
+        }
+        if (email) { // Email 정보가 업데이트되도록 전달되었을 경우
+            user.email = email;
+        }
+        if (password) { // 변경을 위한 패스워드 정보가 전달되었을 경우
+            user.password = password;
+        }
+        return this.usersRepository.save(user);
     }
 }
