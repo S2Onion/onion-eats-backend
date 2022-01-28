@@ -8,6 +8,7 @@ import { JwtModule } from './jwt/jwt.module';
 import { Restaurant } from './restaurants/entity/restaurant.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { User } from './users/entities/user.entity';
+import { Verification } from './users/entities/verification.entity';
 import { UsersModule } from './users/users.module';
 
 console.log(Joi);
@@ -42,7 +43,7 @@ console.log(Joi);
       database: process.env.DB_NAME,
       synchronize: process.env.NODE_ENV !== 'prod', // Entity를 읽어서 Table Migration 진행
       logging: true,
-      entities: [Restaurant, User]
+      entities: [Restaurant, User, Verification]
     }),
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,

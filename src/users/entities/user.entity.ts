@@ -32,6 +32,10 @@ export class User extends CoreEntity {
     @Column({ type: 'enum', enum: UserRole })
     role: UserRole;
 
+    @Field(type => Boolean)
+    @Column({ default: false })
+    emailVerified: boolean;
+
     @BeforeInsert()
     @BeforeUpdate()
     async hashPassword(): Promise<void> {
@@ -42,13 +46,13 @@ export class User extends CoreEntity {
             throw new InternalServerErrorException();
         }
     }
-    
-    async checkPassword(aPassword: string) : Promise<boolean> {
+
+    async checkPassword(aPassword: string): Promise<boolean> {
         try {
             return await bcrypt.compare(aPassword, this.password);
-        } catch(e) {
+        } catch (e) {
             console.error(e);
-            throw new InternalServerErrorException();       
+            throw new InternalServerErrorException();
         }
     }
 }
