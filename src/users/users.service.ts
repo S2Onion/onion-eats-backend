@@ -6,11 +6,13 @@ import { CreateAccountInput } from './dtos/create-account.dto';
 import { EditProfileInput } from './dtos/edit-profile.dto';
 import { LoginInput } from './dtos/login.dto';
 import { User } from './entities/user.entity';
+import { Verification } from './entities/verification.entity';
 
 @Injectable()
 export class UsersService {
     constructor(
         @InjectRepository(User) private readonly usersRepository: Repository<User>,
+        @InjectRepository(Verification) private readonly verificationRepository: Repository<Verification>,
         private readonly jwtService: JwtService,
     ) { }
 
@@ -23,7 +25,10 @@ export class UsersService {
             }
 
             // 계정 생성 및 비밀번호 암호화
-            await this.usersRepository.save(this.usersRepository.create({ email, password, role }))
+            const user = await this.usersRepository.save(this.usersRepository.create({ email, password, role }))
+
+            // 인증 코드 정보 생성
+            await this.verificationRepository.save(this.verificationRepository.create({ user }));
             return { ok: true };
         } catch (e) {
             return { ok: false, error: 'Couldn\'t create account' };
@@ -63,6 +68,10 @@ export class UsersService {
         }
         if (email) { // Email 정보가 업데이트되도록 전달되었을 경우
             user.email = email;
+            user.emailVerified = false; // Email 정보를 업데이트 하였으므로 인증여부 false로 업데이트
+
+            // 인증 코드 정보 생성
+            await this.verificationRepository.save(this.verificationRepository.create({ user }));
         }
         if (password) { // 변경을 위한 패스워드 정보가 전달되었을 경우
             user.password = password;
