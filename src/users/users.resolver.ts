@@ -6,6 +6,7 @@ import { CreateAccountInput, createAccountOutput } from './dtos/create-account.d
 import { EditProfileInput, EditProfileOutPut } from './dtos/edit-profile.dto';
 import { LoginInput, LoginOutput } from './dtos/login.dto';
 import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto';
+import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verify-email.dto';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
 
@@ -65,10 +66,10 @@ export class UsersResolver {
             if (!user) {
                 throw Error();
             }
-            return { ok: true, user: user };
+            return { ok: true, user: user }
         } catch (e) {
             console.error(e);
-            return { ok: false, error: 'User Not Found' };
+            return { ok: false, error: 'User Not Found' }
         }
     }
 
@@ -83,9 +84,24 @@ export class UsersResolver {
     async editProfile(@AuthUser() authUser: User, @Args('input') editProfileInput: EditProfileInput): Promise<EditProfileOutPut> {
         try {
             await this.usersService.editProfile(authUser.id, editProfileInput);
-            return { ok: true };
+            return { ok: true }
         } catch (e) {
-            return { ok: false, error: e };
+            return { ok: false, error: e }
+        }
+    }
+
+    /**
+     * Email 인증 처리
+     * @param verifyEmailInput 인증 코드 정보
+     * @returns 인증 처리 결과
+     */
+    @Mutation(() => VerifyEmailOutput)
+    async verifyEmail(@Args('input') verifyEmailInput: VerifyEmailInput): Promise<VerifyEmailOutput> {
+        try {
+            this.usersService.verifyEmail(verifyEmailInput.code);
+            return { ok: true }
+        } catch (e) {
+            return { ok: false, error: e }
         }
     }
 }

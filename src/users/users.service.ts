@@ -38,7 +38,7 @@ export class UsersService {
     async login({ email, password }: LoginInput): Promise<{ ok: boolean, error?: string, token?: string }> {
         try {
             // Email로 User 정보 확인
-            const user = await this.usersRepository.findOne({ email });
+            const user = await this.usersRepository.findOne({ email }, { select: ['id', 'password'] });
             if (!user) {
                 return { ok: false, error: 'User not found' };
             }
@@ -77,5 +77,21 @@ export class UsersService {
             user.password = password;
         }
         return this.usersRepository.save(user);
+    }
+
+    async verifyEmail(code: string): Promise<boolean> {
+        try {
+            const verification = await this.verificationRepository.findOne({ code }, { relations: ['user'] }); // Code 정보 확인
+            if (!verification) { // DB에 없는 코드일 경우 리턴 false
+                throw new Error();
+            }
+            console.log(verification);
+            verification.user.emailVerified = true; // 전달된 코드에 연결된 이메일 인증 여부 값 true로 업데이트
+            this.usersRepository.save(verification.user);
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
     }
 }
