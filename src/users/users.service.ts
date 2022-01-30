@@ -85,9 +85,9 @@ export class UsersService {
             if (!verification) { // DB에 없는 코드일 경우 리턴 false
                 throw new Error();
             }
-            console.log(verification);
             verification.user.emailVerified = true; // 전달된 코드에 연결된 이메일 인증 여부 값 true로 업데이트
-            this.usersRepository.save(verification.user);
+            await this.usersRepository.save(verification.user);
+            await this.verificationRepository.delete(verification.id); // 인증된 코드 정보 삭제
             return true;
         } catch (e) {
             console.log(e);

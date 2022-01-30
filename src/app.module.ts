@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi'; // 자바 스크립트로 작성되어 있음
 import { JwtMiddleWare } from './jwt/jwt.middleware';
 import { JwtModule } from './jwt/jwt.module';
+import { MailModule } from './mail/mail.module';
 import { Restaurant } from './restaurants/entity/restaurant.entity';
 import { RestaurantsModule } from './restaurants/restaurants.module';
 import { User } from './users/entities/user.entity';
@@ -28,6 +29,9 @@ console.log(Joi);
         DB_PASSWORD: Joi.string().required(),
         DB_NAME: Joi.string().required(),
         PRIVATE_KEY: Joi.string().required(),
+        MAILGUN_API_KEY: Joi.string().required(),
+        MAILGUN_DOMAIN_NAME: Joi.string().required(),
+        MAILGUN_FROM_EMAIL: Joi.string().required()
       }),
     }),
     GraphQLModule.forRoot({
@@ -48,8 +52,14 @@ console.log(Joi);
     JwtModule.forRoot({
       privateKey: process.env.PRIVATE_KEY,
     }),
+    MailModule.forRoot({
+      apiKey: process.env.MAILGUN_API_KEY,
+      fromEmail: process.env.MAILGUN_FROM_EMAIL,
+      doamin: process.env.MAILGUN_DOMAIN_NAME,
+    }),
     RestaurantsModule,
     UsersModule,
+    MailModule,
   ],
   controllers: [],
   providers: [],
