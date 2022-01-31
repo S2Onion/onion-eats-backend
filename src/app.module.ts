@@ -55,7 +55,7 @@ console.log(Joi);
     MailModule.forRoot({
       apiKey: process.env.MAILGUN_API_KEY,
       fromEmail: process.env.MAILGUN_FROM_EMAIL,
-      doamin: process.env.MAILGUN_DOMAIN_NAME,
+      domain: process.env.MAILGUN_DOMAIN_NAME,
     }),
     RestaurantsModule,
     UsersModule,
