@@ -6,14 +6,18 @@ import { MailModuleOption } from './mail.interfaces';
 
 @Injectable()
 export class MailService {
-    constructor(@Inject(CONFIG_OPTIONS) private readonly options: MailModuleOption) { }
+    constructor(@Inject(CONFIG_OPTIONS) private readonly options: MailModuleOption) {
+        // this.sendEmail('test mail', '');
+    }
 
-    private async sendEmail(subject: string, content: string, to: string) {
+    private async sendEmail(subject: string, template: string, to: string) {
         const form = new FormData();
         form.append('from', `Excited User <mailgun@${this.options.domain}>`);
         form.append('to', to);
         form.append('subject', subject);
-        form.append('text', content);
+        form.append('template', template);
+        form.append('v:code', 'asdf');
+        form.append('v:username', 'onion');
 
         const response = await got(`https://api.mailgun.net/v3/${this.options.domain}/messages`, {
             headers: {
