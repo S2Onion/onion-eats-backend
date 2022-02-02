@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JwtService } from 'src/jwt/jwt.service';
+import { MailService } from 'src/mail/mail.service';
 import { Repository } from 'typeorm';
 import { CreateAccountInput } from './dtos/create-account.dto';
 import { EditProfileInput } from './dtos/edit-profile.dto';
@@ -14,6 +15,7 @@ export class UsersService {
         @InjectRepository(User) private readonly usersRepository: Repository<User>,
         @InjectRepository(Verification) private readonly verificationRepository: Repository<Verification>,
         private readonly jwtService: JwtService,
+        private readonly mailService: MailService,
     ) { }
 
     async createAccount({ email, password, role }: CreateAccountInput): Promise<{ ok: boolean, error?: string }> {
@@ -28,7 +30,11 @@ export class UsersService {
             const user = await this.usersRepository.save(this.usersRepository.create({ email, password, role }))
 
             // 인증 코드 정보 생성
-            await this.verificationRepository.save(this.verificationRepository.create({ user }));
+            const verification = await this.verificationRepository.save(this.verificationRepository.create({ user }));
+
+            // 인증 코드 메일 발송
+            this.mailService.sendVerificationEmail(user.email, verification.code);
+
             return { ok: true };
         } catch (e) {
             return { ok: false, error: 'Couldn\'t create account' };
@@ -71,7 +77,10 @@ export class UsersService {
             user.emailVerified = false; // Email 정보를 업데이트 하였으므로 인증여부 false로 업데이트
 
             // 인증 코드 정보 생성
-            await this.verificationRepository.save(this.verificationRepository.create({ user }));
+            const verification = await this.verificationRepository.save(this.verificationRepository.create({ user }));
+
+            // 인증 코드 메일 발송
+            this.mailService.sendVerificationEmail(user.email, verification.code);
         }
         if (password) { // 변경을 위한 패스워드 정보가 전달되었을 경우
             user.password = password;

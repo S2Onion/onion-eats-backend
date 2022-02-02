@@ -56,6 +56,7 @@ console.log(Joi);
       apiKey: process.env.MAILGUN_API_KEY,
       fromEmail: process.env.MAILGUN_FROM_EMAIL,
       domain: process.env.MAILGUN_DOMAIN_NAME,
+      toEmail: process.env.NODE_ENV === 'dev' ? process.env.TO_EMAIL_ADDRESS : null
     }),
     RestaurantsModule,
     UsersModule,
