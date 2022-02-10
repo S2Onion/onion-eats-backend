@@ -7,11 +7,11 @@ import { User } from "./entities/user.entity";
 import { Verification } from "./entities/verification.entity";
 import { UsersService } from './users.service';
 
-const mockRepository = {
+const mockRepository = () => ({
     findOne: jest.fn(),
     save: jest.fn(),
     create: jest.fn(),
-};
+});
 
 const mockJwtService = {
     sign: jest.fn(),
@@ -32,8 +32,8 @@ describe('UsersService', () => {
     beforeAll(async () => {
         const module = await Test.createTestingModule({
             providers: [UsersService,
-                { provide: getRepositoryToken(User), useValue: mockRepository },
-                { provide: getRepositoryToken(Verification), useValue: mockRepository },
+                { provide: getRepositoryToken(User), useValue: mockRepository() },
+                { provide: getRepositoryToken(Verification), useValue: mockRepository() },
                 { provide: JwtService, useValue: mockJwtService },
                 { provide: MailService, useValue: mockMailService },
             ],
@@ -47,19 +47,37 @@ describe('UsersService', () => {
     });
 
     describe('createAccount', () => {
+
+        const createAccountArgs = {
+            email: '',
+            password: '',
+            role: 0
+        };
+
         it('should fail if user exists', async () => {
             usersRepository.findOne.mockResolvedValue({
                 id: 1,
                 email: 'lalala@test.com'
             });
 
-            const result = await service.createAccount({
-                email: '',
-                password: '',
-                role: 0
-            });
+            const result = await service.createAccount(createAccountArgs);
 
-            expect(result).toMatchObject({ ok: false, error: 'There is a user with that email already' });
+            expect(result).toMatchObject({
+                ok: false,
+                error: 'There is a user with that email already'
+            });
+        });
+
+        it('should create a new user', async () => {
+            usersRepository.findOne.mockResolvedValue(undefined);
+            usersRepository.create.mockReturnValue(createAccountArgs);
+
+            await service.createAccount(createAccountArgs);
+            
+            expect(usersRepository.create).toHaveBeenCalledTimes(1); // 함수가 한번반 불려짐을 확인
+            expect(usersRepository.create).toHaveBeenCalledWith(createAccountArgs);
+            expect(usersRepository.save).toHaveBeenCalledTimes(1);
+            expect(usersRepository.save).toHaveBeenCalledWith(createAccountArgs);
         });
     });
 
