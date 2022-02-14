@@ -28,6 +28,8 @@ describe('UsersService', () => {
 
     let service: UsersService;
     let usersRepository: MockRepository<User>;
+    let verificationsRepository: MockRepository<Verification>;
+    let mailService: MailService;
 
     beforeAll(async () => {
         const module = await Test.createTestingModule({
@@ -39,7 +41,9 @@ describe('UsersService', () => {
             ],
         }).compile();
         service = module.get<UsersService>(UsersService);
+        mailService = module.get<MailService>(MailService);
         usersRepository = module.get(getRepositoryToken(User));
+        verificationsRepository = module.get(getRepositoryToken(Verification));
     });
 
     it('should be defined', () => {
@@ -49,8 +53,8 @@ describe('UsersService', () => {
     describe('createAccount', () => {
 
         const createAccountArgs = {
-            email: '',
-            password: '',
+            email: 'test@test.com',
+            password: '12345',
             role: 0
         };
 
@@ -71,13 +75,34 @@ describe('UsersService', () => {
         it('should create a new user', async () => {
             usersRepository.findOne.mockResolvedValue(undefined);
             usersRepository.create.mockReturnValue(createAccountArgs);
+            usersRepository.save.mockResolvedValue(createAccountArgs);
+            verificationsRepository.create.mockReturnValue({
+                user: createAccountArgs
+            });
+            verificationsRepository.save.mockReturnValue({
+                code: 'code'
+            });
 
-            await service.createAccount(createAccountArgs);
-            
+            const result = await service.createAccount(createAccountArgs);
+
             expect(usersRepository.create).toHaveBeenCalledTimes(1); // 함수가 한번반 불려짐을 확인
             expect(usersRepository.create).toHaveBeenCalledWith(createAccountArgs);
             expect(usersRepository.save).toHaveBeenCalledTimes(1);
             expect(usersRepository.save).toHaveBeenCalledWith(createAccountArgs);
+            expect(verificationsRepository.create).toHaveBeenCalledTimes(1);
+            expect(verificationsRepository.create).toHaveBeenCalledWith({
+                user: createAccountArgs
+            });
+
+            expect(verificationsRepository.save).toHaveBeenCalledTimes(1);
+            expect(verificationsRepository.save).toHaveBeenCalledWith({
+                user: createAccountArgs,
+              });
+            expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
+            expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(expect.any(String), expect.any(String));
+            expect(result).toEqual({
+                ok: true
+            });
         });
     });
 
