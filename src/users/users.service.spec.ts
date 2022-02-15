@@ -97,16 +97,37 @@ describe('UsersService', () => {
             expect(verificationsRepository.save).toHaveBeenCalledTimes(1);
             expect(verificationsRepository.save).toHaveBeenCalledWith({
                 user: createAccountArgs,
-              });
+            });
             expect(mailService.sendVerificationEmail).toHaveBeenCalledTimes(1);
             expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(expect.any(String), expect.any(String));
             expect(result).toEqual({
                 ok: true
             });
         });
+
+        it('should fail on exception', async () => {
+            usersRepository.findOne.mockRejectedValue(new Error('error test'));
+            const result = await service.createAccount(createAccountArgs);
+            expect(result).toEqual({ ok: false, error: 'Couldn\'t create account' });
+
+        });
+    });
+    
+    describe('login', () => {
+        const loginArgs = {
+            email: 'test@test.com',
+            password: '12345'
+        }
+        it('should fail if user does not exist', async() => {
+            usersRepository.findOne.mockResolvedValue(null);
+            const result = await service.login(loginArgs);
+
+            expect(usersRepository.findOne).toHaveBeenCalledTimes(1); // TODO 수정 필요
+            expect(usersRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object));
+            expect(result).toEqual({ ok: false, error: 'User not found' });
+        });
     });
 
-    it.todo('login');
     it.todo('findById');
     it.todo('editProfile');
     it.todo('verifyEmail');
